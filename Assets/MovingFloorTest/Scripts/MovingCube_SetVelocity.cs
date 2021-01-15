@@ -68,8 +68,17 @@ public class MovingCube_SetVelocity : UdonSharpBehaviour
         // 乗っているときは床の移動速度を計算してその分の力をプレイヤーに与える
         if (_isPlayerAddForce)
         {
+            // 現在の速度を計算
             _currentVelocity = (_rigidBody.position - _previousPosition) / Time.deltaTime;
+
+            // プレイヤーのy座標の速度を取得して加算
+            var playerVerticalVelocity = _localPlayer.GetVelocity().y;
+            _currentVelocity.y += playerVerticalVelocity;
+
+            // 現在の速度をキャッシュ
             _previousPosition = _rigidBody.position;
+
+            // プレイヤーに速度を設定する
             _localPlayer.SetVelocity(_currentVelocity);
         }
     }
@@ -84,6 +93,9 @@ public class MovingCube_SetVelocity : UdonSharpBehaviour
             _meshRenderer.material = _changedMaterial;
             player.SetRunSpeed(player.GetRunSpeed() * (10 * _speed));
             player.SetWalkSpeed(player.GetWalkSpeed() * (10 * _speed));
+
+            // トリガー外にいる間に_currentVelocityと_previousPositionの差がとんでもないことになるので、一度代入しなおす
+            _previousPosition = _rigidBody.position;
         }
     }
 
